@@ -1,0 +1,827 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuiz Abnormal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --red:#e63946;
+    --cream:#fff8ec;
+    --ink:#26231c;
+    --gold:#ffd60a;
+    --panel:#fffdf7;
+    --panel2:#fbf1de;
+    --green:#4f9d5a;
+  }
+
+  *{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  html,body{
+    margin:0;
+    padding:0;
+  }
+
+  body{
+    min-height:100vh;
+    background:linear-gradient(
+      180deg,
+      #dff2fb 0%,
+      #eaf7ee 55%,
+      #f4ede0 100%
+    );
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:25px 12px 50px;
+  }
+
+  .app{
+    width:100%;
+    max-width:850px;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:18px;
+  }
+
+  header h1{
+    font-family:'Patrick Hand',cursive;
+    font-size:clamp(38px,7vw,58px);
+    margin:0;
+    color:#c1440e;
+    text-shadow:3px 3px 0 rgba(255,255,255,0.7);
+  }
+
+  header p{
+    margin:2px 0 0;
+    font-size:14px;
+    color:#4a4335;
+  }
+
+  .hud{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:30px;
+    background:var(--panel);
+    border:2px dashed #e3c88f;
+    border-radius:14px;
+    padding:10px 18px;
+    margin:14px auto 18px;
+    max-width:430px;
+    font-size:14px;
+    font-weight:600;
+  }
+
+  .score-val{
+    color:#c1440e;
+    font-size:17px;
+  }
+
+  .q-val{
+    color:#2a7f4f;
+  }
+
+  .panel{
+    background:var(--panel);
+    border-radius:20px;
+    padding:28px 25px;
+    box-shadow:0 10px 28px rgba(0,0,0,0.13);
+    min-height:470px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .tag{
+    display:inline-block;
+    width:max-content;
+    background:var(--panel2);
+    color:#8a5a1f;
+    font-size:12px;
+    font-weight:700;
+    padding:5px 12px;
+    border-radius:20px;
+    margin-bottom:12px;
+    letter-spacing:.3px;
+  }
+
+  .prompt{
+    font-size:18px;
+    line-height:1.6;
+    margin:0 0 20px;
+    font-weight:600;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+  }
+
+  .opt-btn{
+    text-align:left;
+    background:#fff;
+    border:2px solid #eadfc4;
+    border-radius:12px;
+    padding:13px 16px;
+    font-size:15px;
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    cursor:pointer;
+    transition:
+      transform .12s ease,
+      box-shadow .12s ease,
+      background .12s ease;
+  }
+
+  .opt-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .opt-btn:disabled{
+    cursor:default;
+  }
+
+  .opt-btn.correct{
+    background:#e7f7ea;
+    border-color:var(--green);
+    color:#215c30;
+    font-weight:700;
+  }
+
+  .opt-btn.wrong{
+    background:#fdecec;
+    border-color:var(--red);
+    color:#a4222e;
+  }
+
+  .opt-btn.dim{
+    opacity:.5;
+  }
+
+  .feedback{
+    margin-top:15px;
+    font-size:13.5px;
+    border-radius:9px;
+    padding:11px 13px;
+    display:none;
+  }
+
+  .feedback.show{
+    display:block;
+  }
+
+  .feedback.ok{
+    background:#e7f7ea;
+    color:#215c30;
+  }
+
+  .feedback.no{
+    background:#fdecec;
+    color:#a4222e;
+  }
+
+  .nav-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:auto;
+    padding-top:20px;
+  }
+
+  .next-btn{
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    border-radius:25px;
+    padding:11px 25px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    display:none;
+  }
+
+  .next-btn.show{
+    display:inline-block;
+    animation:pop .25s ease;
+  }
+
+  @keyframes pop{
+    from{
+      transform:scale(.9);
+      opacity:0;
+    }
+    to{
+      transform:scale(1);
+      opacity:1;
+    }
+  }
+
+  .center-screen{
+    text-align:center;
+    padding:10px;
+    margin:auto;
+  }
+
+  .center-screen h2{
+    font-family:'Patrick Hand',cursive;
+    font-size:34px;
+    margin:8px 0 10px;
+    color:#8a5a1f;
+  }
+
+  .center-screen p{
+    font-size:14px;
+    color:#524b3c;
+    line-height:1.7;
+    max-width:520px;
+    margin:0 auto 18px;
+  }
+
+  .big-emoji{
+    font-size:65px;
+    margin-bottom:5px;
+  }
+
+  .big-btn{
+    background:var(--red);
+    color:#fff;
+    border:none;
+    border-radius:30px;
+    padding:13px 30px;
+    font-size:15.5px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(230,57,70,.35);
+    transition:transform .12s ease;
+  }
+
+  .big-btn:hover{
+    transform:translateY(-2px);
+  }
+
+  .result-score{
+    font-size:42px;
+    font-weight:800;
+    color:#c1440e;
+    font-family:'Patrick Hand',cursive;
+    margin:5px 0;
+  }
+
+  .breakdown{
+    text-align:left;
+    max-width:400px;
+    margin:0 auto 18px;
+    font-size:13.5px;
+  }
+
+  .breakdown div{
+    display:flex;
+    justify-content:space-between;
+    padding:7px 0;
+    border-bottom:1px dashed #e2d8bd;
+  }
+
+  @media(max-width:600px){
+    body{
+      padding:15px 10px 35px;
+    }
+
+    .panel{
+      padding:22px 17px;
+    }
+
+    .hud{
+      gap:18px;
+    }
+
+    .prompt{
+      font-size:16px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <h1>🤪 Kuiz Abnormal 🤪</h1>
+    <p>Jawab pertanyaan dengan benar dan lihat seberapa abnormal pengetahuanmu!</p>
+  </header>
+
+  <div class="hud">
+    <div>
+      Skor:
+      <span class="score-val" id="scoreDisplay">0</span>
+    </div>
+
+    <div>
+      Pertanyaan:
+      <span class="q-val" id="qDisplay">0 / 12</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   DAFTAR PERTANYAAN
+========================= */
+
+const questions = [
+
+  {
+    tag:"Pertanyaan Abnormal",
+    prompt:"🙋 Hikam suka siapa?",
+    options:[
+      "Soraya.",
+      "Zara.",
+      "Keiina.",
+      "Nayla."
+    ],
+    correct:0
+  },
+
+  {
+    tag:"Pertanyaan Abnormal",
+    prompt:"🙋 Hanif bertemu Keiina. Apa yang terjadi?",
+    options:[
+      "Geuleuh.",
+      "Gazzz.",
+      "Iiuuhh.",
+      "Mbung."
+    ],
+    correct:1
+  },
+
+  {
+    tag:"Pertanyaan Abnormal",
+    prompt:"🙋 kenapa keenan suka eisha",
+    options:[
+      "Ngga.",
+      "Salah.",
+      "Gak tahu?",
+      "Ngga, tapi cinta."
+    ],
+    correct:3
+  },
+
+  {
+    tag:"Pertanyaan Abnormal",
+    prompt:"😂 Apakah kalian setuju Hanif confess?",
+    options:[
+      "Setujuuuuuuuu banget.",
+      "Jangan deh.",
+      "Gimana yaa??",
+      "Nooo."
+    ],
+    correct:0
+  },
+
+  {
+    tag:"Pertanyaan Abnormal",
+    prompt:"💬 Albee suka Mya atau Alya?",
+    options:[
+      "Alya.",
+      "Mya!",
+      "Dua-duanya!",
+      "Nggak ada."
+    ],
+    correct:2
+  },
+
+  {
+    tag:"Pertanyaan abnormal",
+    prompt:"💬 apa yang mau dilakukan jika kamu tidak sengaja mendorong temanmu?",
+    options:[
+      "mara marah",
+      "nguamok",
+      "minta maaf",
+      "playing victim."
+    ],
+    correct:2
+  },
+
+  {
+    tag:"makin absurd",
+    prompt:"❓apa yang di lakukan jasmine saat bertemu bariq?",
+    options:[
+      "kabur",
+      "marah.",
+      "salting.",
+      "ngamuk."
+    ],
+    correct:2
+  },
+
+  {
+    tag:"lumayan random",
+    prompt:"✅ **perkiraan**, siapa yang suka sama raja",
+    options:[
+      "zia",
+      "**mungkin zia**.",
+      "pasti zia",
+      "In my oppinion, zia?"
+    ],
+    correct:1
+  },
+
+  {
+    tag:"Bahasa Inggris",
+    prompt:"😕 Kalimat mana yang menunjukkan bahwa kita tidak memahami perkataan seseorang?",
+    options:[
+      "I'm with you.",
+      "Sure!",
+      "I don't get it.",
+      "Listen!"
+    ],
+    correct:2
+  },
+
+  {
+    tag:"Dialog",
+    prompt:"📖 apa yang di lakukan hanif untuk menarik perhatian keiina?",
+    options:[
+      "keii, mau bayar kas",
+      "lo sayang",
+      "I understand.",
+      "Excuse me!"
+    ],
+    correct:0
+  },
+
+  {
+    tag:"Dialog",
+    prompt:"📖 Ethan menjelaskan langkah-langkah sesuatu, lalu bertanya untuk memastikan Dany memahami penjelasannya. Kalimat yang tepat adalah...",
+    options:[
+      "Do you get my point?",
+      "Yes, please.",
+      "I understand.",
+      "All right."
+    ],
+    correct:0
+  },
+
+  {
+    tag:"Dialog",
+    prompt:"📖 Dany akhirnya memahami penjelasan Ethan dan berkata, \"Ok, ___. Thanks.\"",
+    options:[
+      "I don't get it.",
+      "I got what you mean.",
+      "Excuse me.",
+      "Attention, please."
+    ],
+    correct:1
+  }
+
+];
+
+
+const TOTAL = questions.length;
+
+
+/* =========================
+   STATUS GAME
+========================= */
+
+let qi = 0;
+let score = 0;
+let correctCount = 0;
+
+
+/* =========================
+   ELEMENT HTML
+========================= */
+
+const panel = document.getElementById("panel");
+const scoreDisplay = document.getElementById("scoreDisplay");
+const qDisplay = document.getElementById("qDisplay");
+
+
+/* =========================
+   HALAMAN AWAL
+========================= */
+
+function showStart(){
+
+  qDisplay.textContent = "0 / " + TOTAL;
+
+  panel.innerHTML = `
+
+    <div class="center-screen">
+
+      <div class="big-emoji">🤪</div>
+
+      <h2>Selamat Datang di Kuiz Abnormal!</h2>
+
+      <p>
+        Siapkan otak, jangan terlalu serius, dan jawab semua
+        pertanyaan dengan pilihan yang menurutmu paling benar.
+      </p>
+
+      <p>
+        Ada ${TOTAL} pertanyaan.
+        Setiap jawaban benar mendapatkan <b>10 poin</b>.
+      </p>
+
+      <button class="big-btn" id="startBtn">
+        Mulai Kuiz 🚀
+      </button>
+
+    </div>
+
+  `;
+
+  document
+    .getElementById("startBtn")
+    .addEventListener("click",startGame);
+}
+
+
+/* =========================
+   MULAI GAME
+========================= */
+
+function startGame(){
+
+  qi = 0;
+  score = 0;
+  correctCount = 0;
+
+  scoreDisplay.textContent = "0";
+
+  renderQuestion();
+}
+
+
+/* =========================
+   TAMPILKAN PERTANYAAN
+========================= */
+
+function renderQuestion(){
+
+  if(qi >= TOTAL){
+    finishGame();
+    return;
+  }
+
+  qDisplay.textContent = (qi + 1) + " / " + TOTAL;
+
+  const q = questions[qi];
+
+  panel.innerHTML = `
+
+    <span class="tag">
+      ${q.tag}
+    </span>
+
+    <p class="prompt">
+      ${q.prompt}
+    </p>
+
+    <div class="options" id="optWrap"></div>
+
+    <div class="feedback" id="fb"></div>
+
+    <div class="nav-row">
+      <button class="next-btn" id="nextBtn">
+        Pertanyaan Berikutnya →
+      </button>
+    </div>
+
+  `;
+
+
+  const wrap = document.getElementById("optWrap");
+
+
+  /* Membuat tombol pilihan */
+
+  q.options.forEach((opt,index)=>{
+
+    const button = document.createElement("button");
+
+    button.className = "opt-btn";
+
+    button.textContent = opt;
+
+
+    button.addEventListener("click",()=>{
+
+      /* Semua tombol dinonaktifkan */
+
+      Array.from(wrap.children).forEach(btn=>{
+        btn.disabled = true;
+      });
+
+
+      const feedback = document.getElementById("fb");
+
+
+      /* JAWABAN BENAR */
+
+      if(index === q.correct){
+
+        button.classList.add("correct");
+
+        feedback.textContent =
+          "Benar! 🎉 Jawaban kamu tepat.";
+
+        feedback.className =
+          "feedback show ok";
+
+        score += 10;
+
+        correctCount++;
+
+      }
+
+
+      /* JAWABAN SALAH */
+
+      else{
+
+        button.classList.add("wrong");
+
+        wrap.children[q.correct].classList.add("correct");
+
+        feedback.textContent =
+          "Salah 😭 Jawaban yang benar adalah \"" +
+          q.options[q.correct] +
+          "\".";
+
+        feedback.className =
+          "feedback show no";
+
+      }
+
+
+      /* Membuat pilihan lain menjadi redup */
+
+      Array.from(wrap.children).forEach(btn=>{
+
+        if(
+          !btn.classList.contains("correct") &&
+          !btn.classList.contains("wrong")
+        ){
+          btn.classList.add("dim");
+        }
+
+      });
+
+
+      scoreDisplay.textContent = score;
+
+      document
+        .getElementById("nextBtn")
+        .classList.add("show");
+
+    });
+
+
+    wrap.appendChild(button);
+
+  });
+
+
+  /* Tombol pertanyaan berikutnya */
+
+  document
+    .getElementById("nextBtn")
+    .addEventListener("click",()=>{
+
+      qi++;
+
+      renderQuestion();
+
+    });
+
+}
+
+
+/* =========================
+   HASIL AKHIR
+========================= */
+
+function finishGame(){
+
+  const percentage =
+    Math.round((correctCount / TOTAL) * 100);
+
+
+  let emoji = "😵";
+  let title = "Waduhhh!";
+  let message =
+    "Kayaknya kamu perlu mengulang kuiz ini lagi.";
+
+  if(percentage >= 90){
+
+    emoji = "🏆";
+    title = "Kingg";
+    message =
+      "Gila! intel ini mah";
+
+  }
+
+  else if(percentage >= 70){
+
+    emoji = "🔥";
+    title = "Mantap!";
+    message =
+      "Jawaban kamu cukup banyak yang benar!";
+
+  }
+
+  else if(percentage >= 50){
+
+    emoji = "😎";
+    title = "Lumayan!";
+    message =
+      "Masih bisa ditingkatkan lagi.";
+
+  }
+
+
+  panel.innerHTML = `
+
+    <div class="center-screen">
+
+      <div class="big-emoji">
+        ${emoji}
+      </div>
+
+      <h2>
+        ${title}
+      </h2>
+
+      <div class="result-score">
+        ${score} Poin
+      </div>
+
+      <p>
+        ${message}
+      </p>
+
+      <div class="breakdown">
+
+        <div>
+          <span>Jawaban benar</span>
+          <span>${correctCount} / ${TOTAL}</span>
+        </div>
+
+        <div>
+          <span>Jawaban salah</span>
+          <span>${TOTAL - correctCount}</span>
+        </div>
+
+        <div>
+          <span>Persentase</span>
+          <span>${percentage}%</span>
+        </div>
+
+      </div>
+
+      <button class="big-btn" id="restartBtn">
+        Main Lagi 🔁
+      </button>
+
+    </div>
+
+  `;
+
+
+  document
+    .getElementById("restartBtn")
+    .addEventListener("click",showStart);
+
+}
+
+
+/* =========================
+   JALANKAN
+========================= */
+
+showStart();
+
+</script>
+
+</body>
+</html>
+```
